@@ -1,35 +1,33 @@
-import Html exposing (text, button, Html, div)
-import Html.Events exposing (onClick)
+import Html exposing (text, Html, div, input)
+import Html.Events exposing (onInput)
+import Html.Attributes exposing (placeholder)
 import Debug exposing (log)
 
 -- MODEL
-type alias Model = Int
+type alias Model = String
 
 
 -- UPDATE
 update : Msg -> Model -> Model
-update msg model =
-  case msg of
-    Incriment -> model + 1
-    Decrement -> model - 1
+update msg model = msg
 
-type Msg = Incriment | Decrement
+-- MESSAGE
+type alias Msg = String
 
 -- VIEW
 view : Model -> Html Msg
 view model =
   div []
     [
-      button [onClick Incriment] [text "+"],
-      button [onClick Decrement] [text "-"],
-      text <| toString model
+      input  [placeholder "Text to reverse", onInput identity] [text "+"],
+      div [] [text <| String.reverse model]
     ]
 
 --MAIN
-main : Program Never Int Msg
+main : Program Never String Msg
 main =
   Html.beginnerProgram {
-    model = 0,
+    model = "",
     view = view,
     update = update
   }
