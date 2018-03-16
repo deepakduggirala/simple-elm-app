@@ -1,56 +1,47 @@
-import Html exposing (text, Html, div, input)
-import Html.Events exposing (onInput)
-import Html.Attributes exposing (placeholder, type_)
+import Html exposing (text, Html, div, button, h1)
+import Html.Events exposing (onClick)
 import Debug exposing (log)
+import Random
 
 -- MODEL
-type alias Model =
-  {
-    name: String,
-    password: String,
-    passwordAgain: String
-  }
+type alias Model = Int
 
-model : Model
-model = Model "" "" ""
+init : ( Model, Cmd Msg )
+init = ( 1, Cmd.none)
 
 
 -- UPDATE
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Name name -> { model | name = name }
-    Password password -> { model | password = password }
-    PasswordAgain passwordAgain -> { model | passwordAgain = passwordAgain }
+    Roll -> ( model, Random.generate NewFace (Random.int 1 6))
+    NewFace f -> ( f, Cmd.none )
 
 -- MESSAGE
-type Msg =
-  Name String
-  | Password String
-  | PasswordAgain String
+type Msg
+  = Roll
+  | NewFace Int
 
 -- VIEW
 view : Model -> Html Msg
 view model =
   div []
     [
-      input  [type_ "text", placeholder "Name", onInput Name] [],
-      input  [type_ "password", placeholder "Password", onInput Password] [],
-      input  [type_ "password", placeholder "Re-enter password", onInput PasswordAgain] [],
-      viewValidation model
+      h1 [] [text <| toString model], 
+      button [onClick Roll] [text "Roll"]
     ]
 
-viewValidation : Model -> Html Msg
-viewValidation model =
-  text <| if model.password == model.passwordAgain
-    then "OK"
-    else "Passwords do not match"
+-- SUBSCRIPTIONS
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
 
 --MAIN
 main : Program Never Model Msg
 main =
-  Html.beginnerProgram {
-    model = model,
+  Html.program
+  { init = init,
     view = view,
-    update = update
+    update = update,
+    subscriptions = subscriptions
   }
